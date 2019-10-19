@@ -45,11 +45,12 @@ var editing = false;
 function update(logs) {
     if (!editing) {
         var code = document.querySelector('code');
-        if (code)
-            code.innerText = logs.join('\n');
-            
+        if (code) {
+            code.innerText = logs.join("\r\n");
+        }
+        
         Prism.highlightAll();
-            
+
         if (logs && logs.length > 0) {
             document.querySelector('#copy').style.display = '';
             document.querySelector('#clear').style.display = '';
