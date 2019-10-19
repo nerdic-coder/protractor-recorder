@@ -5,6 +5,11 @@
  * @author ocodia
  */
 
+ code {
+	display: block;
+	white-space: pre-wrap;
+}
+ 
 code[class*="language-"],
 pre[class*="language-"] {
 	color: #f8f8f2;
@@ -12,7 +17,6 @@ pre[class*="language-"] {
 	text-shadow: 0 1px rgba(0, 0, 0, 0.3);
 	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 	text-align: left;
-	white-space: pre;
 	word-spacing: normal;
 	word-break: normal;
 	word-wrap: normal;
@@ -120,4 +124,3 @@ pre[class*="language-"] {
 .token.entity {
 	cursor: help;
 }
-
