@@ -10,8 +10,9 @@
     var mouse = [];
 
     document.addEventListener('click', function (e) {
-        if (e.target.tagName.toLowerCase() != 'canvas')
+        if (e.target.tagName.toLowerCase() != 'canvas'){
             log('element(by.css(\'' + selector(e.target).replace(/\\\"/g, '\\\\\\"') + '\'))' + '.click();');
+        }
     });
 
     document.addEventListener('mousedown', function (e) {
@@ -62,25 +63,26 @@
     var selector = function (target) {
         var query = '';
 
-        if (target == document)
+        if (target == document) {
             query = 'body';
-        else {
-            var attr = ['ng-model', 'ng-href', 'name', 'aria-label'].reduce(function (a, b) { return a || (target.getAttribute(b) ? b : null); }, null);
-            if (attr)
+        } else {
+            var attr = ['ng-model', 'ng-href', 'name', 'aria-label', 'id', 'ng-reflect-router-link'].reduce(function (a, b) { return a || (target.getAttribute(b) ? b : null); }, null);
+            if (attr) {
                 query = target.tagName.toLowerCase() + '[' + attr + '="' + target.getAttribute(attr).replace(/\\/g, '\\\\').replace(/\'/g, '\\\'').replace(/\"/g, '\\"').replace(/\0/g, '\\0') + '"]';
-            else
+            } else {
                 query = target.tagName.toLowerCase();
+            }
 
             var nodes = target.parentNode.querySelectorAll(query);
-            if (nodes && nodes.length > 1)
+            if (nodes && nodes.length > 1) {
                 query += ':nth-of-type(' + (Array.prototype.slice.call(nodes).indexOf(target) + 1).toString() + ')';
-
+            }
             query = query.replace(/\s/g, ' ');
         }
 
-        if (document.querySelectorAll(query).length > 1 && target.parentNode)
+        if (document.querySelectorAll(query).length > 1 && target.parentNode) {
             query = selector(target.parentNode) + '>' + query;
-
+        }
         return query;
     };
     
