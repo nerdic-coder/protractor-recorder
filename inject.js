@@ -85,16 +85,18 @@
     };
     
     var log = function (action) {
-        if (window.protractor.logs.length == 0)
+        if (window.protractor.logs.length == 0) {
             window.protractor.logs.push('browser.driver.manage().window().setSize(' + window.outerWidth + ', ' + window.outerHeight + ');');
-        
-        if (window.protractor.ignoreSynchronization && time)
-            window.protractor.logs.push('browser.sleep(' + (new Date() - time).toString() + ');');
+        }
 
+        if (window.protractor.ignoreSynchronization && time) {
+            window.protractor.logs.push('browser.sleep(' + (new Date() - time).toString() + ');');
+        }
         time = new Date();
         
-        if (!url || url != window.location.hash)
+        if ((!url || url != window.location.hash) && window.location.hash) {
             window.protractor.logs.push('// URL: ' + window.location.hash);
+        }
 
         url = window.location.hash;
 
