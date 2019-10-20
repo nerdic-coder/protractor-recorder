@@ -10,12 +10,29 @@
     var mouse = [];
     var previousSelection = '';
     var expectLogged = false;
+    var contextmenuClicked = false;
 
     document.addEventListener('click', function (e) {
-        if (e.target.tagName.toLowerCase() != 'canvas' && !expectLogged) {
+        contextmenuClicked = false;
+        if (window.getSelection().toString() && previousSelection != window.getSelection().toString() && !expectLogged) {
+            previousSelection = window.getSelection().toString();
+            log('expect(element(by.css(\'' + selector(e.target).replace(/\\\"/g, '\\\\\\"') +  '\')).getText()).toContain([\'' + window.getSelection().toString() + '\']);');
+        }
+        else if (e.target.tagName.toLowerCase() != 'canvas' && !expectLogged) {
             log('element(by.css(\'' + selector(e.target).replace(/\\\"/g, '\\\\\\"') + '\'))' + '.click();');
         }
         expectLogged = false;
+        previousSelection = '';
+    });
+
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        if (!expectLogged) {
+            contextmenuClicked = true;
+            log('expect(element(by.css(\'' + selector(e.target).replace(/\\\"/g, '\\\\\\"') +  '\')).isPresent()).toBeTruthy([\'' + selector(e.target).replace(/\\\"/g, '\\\\\\"') + '\']);');
+        }
+        expectLogged = false;
+        return false;
     });
 
     document.addEventListener('mousedown', function (e) {
@@ -28,14 +45,17 @@
             mouse.push(e);
     });
 
-    document.addEventListener('mouseup', function (e) {
-        if (window.getSelection().toString() && previousSelection != window.getSelection().toString()) {
+    document.addEventListener('mouseup', function (event) {
+        if (event.which > 1) {
+            return;
+        }
+        if (window.getSelection().toString() && previousSelection != window.getSelection().toString() && !contextmenuClicked) {
             previousSelection = window.getSelection().toString();
             expectLogged = true;
-            log('expect(element(by.css(\'' + selector(e.target).replace(/\\\"/g, '\\\\\\"') +  '\')).getText()).toContain([\'' + window.getSelection().toString() + '\']);');
+            log('expect(element(by.css(\'' + selector(event.target).replace(/\\\"/g, '\\\\\\"') +  '\')).getText()).toContain([\'' + window.getSelection().toString() + '\']);');
         }
         else {
-            if (e.target.tagName.toLowerCase() == 'canvas' && mouse && mouse.length > 0 && mouse[0].target == e.target) {
+            if (event.target.tagName.toLowerCase() == 'canvas' && mouse && mouse.length > 0 && mouse[0].target == event.target) {
                 if (mouse.reduce(function (a, b) { return a.clientX - b.clientX; }, mouse[0]) <= 1 && mouse.reduce(function (a, b) { return a.clientY - b.clientY; }, mouse[0]) <= 1)
                     log('browser.driver.actions().mouseMove(element(by.css(\'' + selector(mouse[0].target).replace(/\\\"/g, '\\\\\\"') + '\')), {x: ' + mouse[0].clientX.toString() + ', y:' + mouse[0].clientY.toString() + '}).click().perform();');
                 else
@@ -76,7 +96,7 @@
         if (target == document) {
             query = 'body';
         } else {
-            var attr = ['ng-model', 'ng-href', 'name', 'aria-label', 'id', 'ng-reflect-router-link'].reduce(function (a, b) { return a || (target.getAttribute(b) ? b : null); }, null);
+            var attr = ['ng-model', 'ng-href', 'name', 'aria-label', 'id', 'ng-reflect-router-link', 'src', 'href', '(click)'].reduce(function (a, b) { return a || (target.getAttribute(b) ? b : null); }, null);
             if (attr) {
                 query = target.tagName.toLowerCase() + '[' + attr + '="' + target.getAttribute(attr).replace(/\\/g, '\\\\').replace(/\'/g, '\\\'').replace(/\"/g, '\\"').replace(/\0/g, '\\0') + '"]';
             } else {
